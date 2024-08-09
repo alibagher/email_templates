@@ -1,10 +1,15 @@
 use axum::{
     extract::State,
+    extract::Query,
     http::StatusCode,
+    http::Method,
     response::{IntoResponse, Response},
-    routing::get,
+    routing::{get, post, put, delete},
     Json, Router,
 };
+
+use tower_http::cors::{Any, CorsLayer};
+use serde_json::json;
 
 /// This mod emulates the entire database.
 /// No changes should be made to any code in this mod.
@@ -137,22 +142,43 @@ mod db {
 
 /// This is your template type. It is the type the database stores.
 /// Modify this any way.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct Template {
-    // ...
+    pub id: i32,
+    pub subject: String,
+    pub body: String,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+struct PartialTemplate {
+    pub subject: String,
+    pub body: String,
 }
 
 #[tokio::main]
 async fn main() {
     // create the database, you do not need to change this
     let database = db::Database::<Template>::new();
+
+    let cors = CorsLayer::new()
+        // allow `GET` and `POST` when accessing the resource
+        // .allow_methods([Method::GET, Method::POST])
+        // allow requests from any origin
+        .allow_origin(Any);
+
     let app = Router::new()
         // add the example route to the router
+        .route("/create_template", post(create_template_handler))
+        .route("/read_template", get(read_template))
+        .route("/update_template", put(update_template))
+        .route("/delete_template", delete(delete_template))
         .route("/count_templates", get(example_handler_count_templates))
+        .route("/select_templates", get(select_templates))
+        .layer(CorsLayer::permissive())
         // add the database state to the app.
         // see how the database is retreived (extracted) in the example handler parameters
         .with_state(database);
-
+     
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
 
     println!("listening on {}", listener.local_addr().unwrap());
@@ -165,6 +191,66 @@ struct ExampleHandlerCountTemplatesResponse {
     count: usize,
 }
 
+// TODO: can add Option<i32> to handle missing ID case
+#[derive(Debug, serde::Deserialize)]
+pub struct CRUDTemplateParams {
+    pub id: i32,
+}
+
+async fn create_template_handler(
+    State(db): State<db::Database<Template>>,
+    Json(partialTemplate): Json<PartialTemplate>,
+) -> Result<Json<Template>, AppError> {
+
+    // Generate a new ID for the template (you might want a more robust ID generation strategy)
+    let new_id: i32 = (db.count_templates()?) as i32 + 1;
+    let mut partTem = partialTemplate;
+    let mut new_template = Template{ 
+        id: new_id, 
+        subject: partTem.subject, 
+        body: partTem.body
+    };
+
+    db.create_template(new_id, new_template.clone())?;
+    Ok(Json(new_template))
+}
+
+async fn read_template(
+    State(db): State<db::Database<Template>>,
+    Query(query): Query<CRUDTemplateParams>,
+) -> Result<Json<Option<Template>>, AppError> {
+
+    let template_id = query.id;
+
+    let template = db.read_template(template_id)?;
+    Ok(Json(template))
+}
+
+async fn update_template(
+    State(db): State<db::Database<Template>>,
+    Query(params): Query<CRUDTemplateParams>,
+    Json(updated_template): Json<Template>,
+) -> Result<Json<Template>, AppError> {
+
+    let template_id = params.id;
+    let mut updated_template = updated_template;
+    updated_template.id = template_id;
+
+    db.update_template(template_id, updated_template.clone())?;
+    Ok(Json(updated_template))
+}
+
+async fn delete_template(
+    State(db): State<db::Database<Template>>,
+    Query(params): Query<CRUDTemplateParams>,
+) -> Result<StatusCode, AppError> {
+
+    let template_id = params.id;
+
+    db.delete_template(template_id)?;
+    Ok(StatusCode::NO_CONTENT)
+}
+
 /// Example handler that will count all the templates in the database and return it as json.
 async fn example_handler_count_templates(
     State(db): State<db::Database<Template>>,
@@ -172,10 +258,21 @@ async fn example_handler_count_templates(
     // get the count from the database
     let count = db.count_templates()?;
     // construct the response struct
-    let response = ExampleHandlerCountTemplatesResponse { count };
+    let response: ExampleHandlerCountTemplatesResponse = ExampleHandlerCountTemplatesResponse { count };
+
     // convert the response struct into a Json and return it
     Ok(response.into())
 }
+
+async fn select_templates(
+    State(db): State<db::Database<Template>>,
+) -> Result<Json<Vec<Template>>, AppError> {
+
+    let templates = db.select_templates(|_| true)?;
+    Ok(Json(templates))
+}
+
+
 
 // Make our own error that wraps `anyhow::Error`.
 struct AppError(anyhow::Error);

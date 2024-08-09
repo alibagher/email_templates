@@ -4,6 +4,7 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import MenuAppBar from "./components/MenuAppBar";
 import ReadmePage from "./pages/ReadMePage";
 import TemplateList from "./pages/TemplateList";
+import CreateTemplate from "./pages/CreateTemplate";
 
 const App: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<ReadmePage />} />
           <Route path="/list" element={<TemplateList />} />
+          <Route path="/create" element={<CreateTemplate />} />
         </Routes>
       </Box>
     </Router>

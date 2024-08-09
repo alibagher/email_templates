@@ -58,6 +58,9 @@ const MenuAppBar: React.FC = () => {
             <ListItem button onClick={() => handleNavigation("/list")}>
               <ListItemText primary="Template List" />
             </ListItem>
+            <ListItem button onClick={() => handleNavigation("/create")}>
+              <ListItemText primary="Create Template" />
+            </ListItem>
           </List>
         </Box>
       </Drawer>
