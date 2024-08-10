@@ -2,63 +2,43 @@
 import { Container, Typography, Paper, Box, Button, TextField } from "@mui/material";
 import React, { useEffect, useState }  from "react";
 import apiClient from "../api/axios";
+import GenericForm from '../components//GenericForm';
 
 interface Template {
-  id: number;
+  // id: number;
   subject: string;
   body: string;
 }
 
 const CreateTemplate: React.FC = () => {
-  const [subject, setSubject] = useState("");
-  const [body, setBody] = useState("");
   const [createdTemplate, setCreatedTemplate] = useState<Template | null>(null);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault(); // Prevent default form submission behavior
-
+  // Will be called by GenericForm
+  const handleCreateSubmit = async (formData) => {
+    // TODO: make sure that all fields are filled out before submitting
     try {
-      const newTemplate: Template = { subject, body };
+      const newTemplate = { ...formData };
+      // const newTemplate: Template = { subject: formData.subject, body: formData.body };
+      console.log('template in newTemplate:', newTemplate);
       const response = await apiClient.post<Template>("http://127.0.0.1:3000/create_template", newTemplate);
       setCreatedTemplate(response.data);
-      setSubject(""); // Clear input fields after successful creation
-      setBody("");
     } catch (error) {
       console.error("Error creating template:", error);
-      // Handle error gracefully (e.g., display an error message)
     }
   };
 
-  return (
+  return ( 
     <Container>
       <Box my={4}>
         <Typography variant="h4" gutterBottom>
           Create Template
         </Typography>
         <Paper elevation={3} style={{ padding: "16px" }}>
-          <form onSubmit={handleSubmit}>
-            <TextField
-              label="Template subject"
-              type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="body"
-              multiline
-              rows={4}
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              fullWidth
-              margin="normal"   
-
-            />
-            <Button type="submit" variant="contained" color="primary">
-              Create Template
-            </Button>
-          </form>
+          <GenericForm
+            onSubmit={handleCreateSubmit}
+            // initialValues={{  }} // Pass initial values from CreateTemplateForm state
+            submitButtonLabel="Create"
+          />
           {createdTemplate && (
             <Box mt={2}>
               <Typography variant="subtitle1">Created Template:</Typography>
