@@ -18,9 +18,13 @@ services:
 
   backend:
     #image: example/backend
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args: 
+        DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
     ports: 
       - "127.0.0.1:3000:3000"
     # network_mode: "host"
@@ -31,3 +35,19 @@ services:
           ignore:
             - target/
           action: rebuild
+
+  db:
+    container_name: db
+    image: postgres:12
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      # POSTGRES_DATA: /var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
+# volumes:
+#   pgdata: {}

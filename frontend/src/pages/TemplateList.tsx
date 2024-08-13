@@ -99,7 +99,7 @@ const TemplateList: React.FC = () => {
                   <TableRow>
                     <TableCell>ID</TableCell>
                     <TableCell>Subject</TableCell>
-                    <TableCell>Body</TableCell>   
+                    <TableCell>Body</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
