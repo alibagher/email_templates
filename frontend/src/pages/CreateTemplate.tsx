@@ -43,7 +43,6 @@ const CreateTemplate: React.FC = () => {
             <Box mt={2}>
               <Typography variant="subtitle1">Created Template:</Typography>
               <ul>
-                <li>ID: {createdTemplate.id}</li>
                 <li>Subject: {createdTemplate.subject}</li>
                 <li>Body: {createdTemplate.body}</li>
               </ul>

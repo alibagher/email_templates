@@ -8,7 +8,8 @@ const ReadmePage: React.FC = () => {
   useEffect(() => {
     fetch("/README.md")
       .then((response) => response.text())
-      .then((text) => setContent(text));
+      .then((text) => {setContent(text);
+      console.log("Updated content:", text);});
   }, []);
 
   return (

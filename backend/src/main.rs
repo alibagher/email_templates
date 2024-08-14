@@ -204,7 +204,6 @@ async fn main() {
         }
     }
 
-
     let cors = CorsLayer::new()
         .allow_origin(Any);
 
@@ -243,10 +242,9 @@ async fn create_template_handler(
         Json(partial_template): Json<PartialTemplate>,
     ) -> Result<Json<Template>, AppError> {
     // Generate a new ID for the template (you might want a more robust ID generation strategy)
-    let new_id: i32 = 10;  ///(db.count_templates()?) as i32 + 1;
     let mut partTem = partial_template;
-    let mut new_template = Template{ 
-        id: new_id, 
+    let mut new_template: Template = Template{ 
+        id: 0, 
         subject: partTem.subject, 
         body: partTem.body
     };
@@ -258,8 +256,10 @@ async fn create_template_handler(
             eprintln!("connection error: {}", e);
         }
     });
-    client.execute( "INSERT INTO templates (subject, body) VALUES ($1, $2) RETURNING id",
+
+    let retID = client.execute( "INSERT INTO templates (subject, body) VALUES ($1, $2) RETURNING id",
     &[&new_template.subject, &new_template.body]).await?;
+
     Ok(Json(new_template))
 }
 

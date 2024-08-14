@@ -74,7 +74,6 @@ const TemplateList: React.FC = () => {
 
   const handleCreateTemplate = async (newTemplate: Template) => {
     try {
-      console.log("got here!!!!!!")
       const response = await apiClient.post<Template>("http://127.0.0.1:3000/create_template", newTemplate);
       setTemplates([...templates, response.data]); // Update local state with new template
       setOpen(false); // Close the modal after successful creation
@@ -100,6 +99,8 @@ const TemplateList: React.FC = () => {
                     <TableCell>ID</TableCell>
                     <TableCell>Subject</TableCell>
                     <TableCell>Body</TableCell>
+                    <TableCell>Edit Template</TableCell>
+                    <TableCell>Delete</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
