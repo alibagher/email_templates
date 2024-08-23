@@ -12,6 +12,4 @@ The root compose file has been edited to add directions to build the postgres da
 
 After the Docker containers are running, you should be able to access the site by visiting http://localhost:8080
 
-## Product Mapping Section
-
 Please refer to the ProductMapping.md file for more information.
