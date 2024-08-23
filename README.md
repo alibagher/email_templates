@@ -8,7 +8,7 @@ The website is hosted on localhost and all three containers (frontend, backend, 
 `docker compose up -w --build` 
 Simply clone this repo and run the above command!
 
-The root compose file has been edited to add directions to build the postgres database, and set an environment variable on the backend pointing to the database as a URL. This database allows for persistant data, meaning all Emial Templates will be available even after closing the browser, or restarting the Docker containers.
+The root compose file has been edited to add directions to build the postgres database, and set an environment variable on the backend pointing to the database as a URL. This database allows for persistant data, meaning all Email Templates will be available even after closing the browser, or restarting the Docker containers.
 
 After the Docker containers are running, you should be able to access the site by visiting http://localhost:8080
 
