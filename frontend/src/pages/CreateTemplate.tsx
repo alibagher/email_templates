@@ -18,7 +18,6 @@ const CreateTemplate: React.FC = () => {
     // TODO: make sure that all fields are filled out before submitting
     try {
       const newTemplate = { ...formData };
-      // const newTemplate: Template = { subject: formData.subject, body: formData.body };
       console.log('template in newTemplate:', newTemplate);
       const response = await apiClient.post<Template>("http://127.0.0.1:3000/create_template", newTemplate);
       setCreatedTemplate(response.data);
@@ -36,7 +35,6 @@ const CreateTemplate: React.FC = () => {
         <Paper elevation={3} style={{ padding: "16px" }}>
           <GenericForm
             onSubmit={handleCreateSubmit}
-            // initialValues={{  }} // Pass initial values from CreateTemplateForm state
             submitButtonLabel="Create"
           />
           {createdTemplate && (
